@@ -1,12 +1,20 @@
-function [taxis, tcourse, spikeTime, cellID] = simulatorWClass(p,tspan,initialValue)
+function [taxis, tcourse, spikeTimes] = simulatorWClass(p,tspan,initialValue)
 
 % [taxis,tcourse] = ode23(@GAmodel, tspan, initialValue);
 % [taxis,tcourse] = ode45(@GAmodel, tspan, initialValue);
 [taxis,tcourse] = ode23(@Compte_ds_mainenModel, tspan, initialValue);
 
 if nargin>2
-    [tidx, cellID] = find(tcourse > p.Vth);
-    spikeTime = taxis(tidx);
+    %     [tidx, cellID] = find(tcourse > p.Vth);
+    %     spikeTime = taxis(tidx);
+     for icell = 1:p.Ne
+         cache = trace2Event(tcourse(:,icell)>0);
+         spikeTimes{1}{icell} = taxis(cache(:,1)); %exc
+     end
+     for icell = p.Netot+1:p.Netot+p.Ni
+         cache = trace2Event(tcourse(:,icell)>0);
+         spikeTimes{2}{icell-p.Netot} = taxis(cache(:,1)); %inh
+     end
 end
   
     function dVar = CompteModel(t, Var)

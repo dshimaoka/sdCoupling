@@ -8,6 +8,10 @@ else
     p.Ni=256;%: #inhibitory neurons
 end
 
+p.Netot = 20*p.Ne;
+p.Nitot = 6*p.Ni;
+
+        
 p.Cm = 1;%: membrane capacitance 1 uF/cm^2
 p.Cmd = 0.75;%:Mainen 1996
 p.As = 0.015;%: soma of excitatory neuron surface area  mm^2

@@ -60,21 +60,21 @@ classdef compte_ds_mainen
             o.md = Var(19*o.p.Ne+1:20*o.p.Ne,:);%Nad activation of excitatory dendrite Mainen 96
             
             
-            o.Vi = Var(o.Netot+1:o.Netot+o.p.Ni,:); %membrane potential of inhibitoroy neuron mV
-            o.siAMPA  = Var(o.Netot+o.p.Ni+1:o.Netot+2*o.p.Ni,:); %fraction of open AMPA receptor channels on inhibitory neuron
-            o.siNMDA = Var(o.Netot+2*o.p.Ni+1:o.Netot+3*o.p.Ni,:); %fraction of open NMDA receptor channels on inhibitory neuron
-            o.siGABA = Var(o.Netot+3*o.p.Ni+1:o.Netot+4*o.p.Ni,:); %fraction of open GABA receptor channels on inhibitory neuron
-            o.hi = Var(o.Netot+4*o.p.Ni+1:o.Netot+5*o.p.Ni,:); %sodium channel for inhibitory neuron
-            o.ni = Var(o.Netot+5*o.p.Ni+1:o.Netot+6*o.p.Ni,:); %sodium channel for inhibitory neuron
+            o.Vi = Var(o.p.Netot+1:o.p.Netot+o.p.Ni,:); %membrane potential of inhibitoroy neuron mV
+            o.siAMPA  = Var(o.p.Netot+o.p.Ni+1:o.p.Netot+2*o.p.Ni,:); %fraction of open AMPA receptor channels on inhibitory neuron
+            o.siNMDA = Var(o.p.Netot+2*o.p.Ni+1:o.p.Netot+3*o.p.Ni,:); %fraction of open NMDA receptor channels on inhibitory neuron
+            o.siGABA = Var(o.p.Netot+3*o.p.Ni+1:o.p.Netot+4*o.p.Ni,:); %fraction of open GABA receptor channels on inhibitory neuron
+            o.hi = Var(o.p.Netot+4*o.p.Ni+1:o.p.Netot+5*o.p.Ni,:); %sodium channel for inhibitory neuron
+            o.ni = Var(o.p.Netot+5*o.p.Ni+1:o.p.Netot+6*o.p.Ni,:); %sodium channel for inhibitory neuron
         end
         
-        function nn = Netot(o)
-            nn = 20*o.p.Ne;
-        end
-        
-        function nn = Nitot(o)
-            nn = 6*o.p.Ni;
-        end
+        %         function nn = Netot(o)
+        %             nn = 20*o.p.Ne;
+        %         end
+        %
+        %         function nn = Nitot(o)
+        %             nn = 6*o.p.Ni;
+        %         end
         
         
         function [currentDensity, conductance] = INa(o)
@@ -512,12 +512,12 @@ classdef compte_ds_mainen
             allDif(18*o.p.Ne+1:19*o.p.Ne,:) = o.dq;%KM activation of excitatory dendrite Mainen 96
             allDif(19*o.p.Ne+1:20*o.p.Ne,:) = o.dmd;%Nad activation of excitatory dendrite Mainen 96
             
-            allDif(o.Netot+1:o.Netot+o.p.Ni,1) = o.dVi; %membrane potential of inhibitoroy neuron
-            allDif(o.Netot+o.p.Ni+1:o.Netot+2*o.p.Ni,1) = o.dsiAMPA; %fraction of open AMPA receptor channels on inhibitory neuron
-            allDif(o.Netot+2*o.p.Ni+1:o.Netot+3*o.p.Ni,1) = o.dsiNMDA; %fraction of open NMDA receptor channels on inhibitory neuron
-            allDif(o.Netot+3*o.p.Ni+1:o.Netot+4*o.p.Ni,1) = o.dsiGABA; %fraction of open GABA receptor channels on inhibitory neuron
-            allDif(o.Netot+4*o.p.Ni+1:o.Netot+5*o.p.Ni,1) = o.dhi; %sodium channel for inhibitory neuron
-            allDif(o.Netot+5*o.p.Ni+1:o.Netot+6*o.p.Ni,1) = o.dni; %potassium channel for inhibitory neuron
+            allDif(o.p.Netot+1:o.p.Netot+o.p.Ni,1) = o.dVi; %membrane potential of inhibitoroy neuron
+            allDif(o.p.Netot+o.p.Ni+1:o.p.Netot+2*o.p.Ni,1) = o.dsiAMPA; %fraction of open AMPA receptor channels on inhibitory neuron
+            allDif(o.p.Netot+2*o.p.Ni+1:o.p.Netot+3*o.p.Ni,1) = o.dsiNMDA; %fraction of open NMDA receptor channels on inhibitory neuron
+            allDif(o.p.Netot+3*o.p.Ni+1:o.p.Netot+4*o.p.Ni,1) = o.dsiGABA; %fraction of open GABA receptor channels on inhibitory neuron
+            allDif(o.p.Netot+4*o.p.Ni+1:o.p.Netot+5*o.p.Ni,1) = o.dhi; %sodium channel for inhibitory neuron
+            allDif(o.p.Netot+5*o.p.Ni+1:o.p.Netot+6*o.p.Ni,1) = o.dni; %potassium channel for inhibitory neuron
         end
         
         function conductance = condSyn_exc_d(o) %correct?
