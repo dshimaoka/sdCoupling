@@ -2,13 +2,13 @@
 if ispc
 saveServer = ['X:' filesep 'Massive' filesep 'sdCoupling'];
 else
-    saveServer = '/tmp/14223/gvfs/smb-share:server=storage.erc.monash.edu.au,share=shares/MNHS-dshi0006';
+    saveServer = '/tmp/$(id -u)/gvfs/smb-share:server=storage.erc.monash.edu.au,share=shares/MNHS-dshi0006/Massive/sdCoupling';
 end
 close all
 
 %dt = 0.06; %ms Compte 2003
 dt = 0.25; %ms Mainen 1996
-tspan_c = [0:dt:1000];%ms
+tspan_c = [0:dt:10];%ms
 
 
 %default parameters
