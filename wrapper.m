@@ -3,7 +3,8 @@ if ispc
     saveServer = ['X:' filesep 'Massive' filesep 'sdCoupling'];
     addpath('C:\Users\dshi0006\git\dsbox\');
 else
-    saveServer = '/tmp/$(id -u)/gvfs/smb-share:server=storage.erc.monash.edu.au,share=shares/MNHS-dshi0006/Massive/sdCoupling';
+    %saveServer = '/tmp/$(id -u)/gvfs/smb-share:server=storage.erc.monash.edu.au,share=shares/MNHS-dshi0006/Massive/sdCoupling';
+    saveServer = '';
     addpath('/home/dshi0006/git/dsbox');
 end
 close all
