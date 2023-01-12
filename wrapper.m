@@ -4,7 +4,7 @@ if ispc
     addpath('C:\Users\dshi0006\git\dsbox\');
 else
     %saveServer = '/tmp/$(id -u)/gvfs/smb-share:server=storage.erc.monash.edu.au,share=shares/MNHS-dshi0006/Massive/sdCoupling';
-    saveServer = '';
+    saveServer = '/home/dshi0006/tmpData';
     addpath('/home/dshi0006/git/dsbox');
 end
 close all
@@ -15,7 +15,7 @@ tspan_c = [0:dt:10];%ms
 
 
 %default parameters
-saveFig = 0;
+saveFig = 1;
 doSingle = 0;
 run('param.m');
 p0 = p;
