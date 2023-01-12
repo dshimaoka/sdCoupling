@@ -10,7 +10,7 @@ close all
 
 %dt = 0.06; %ms Compte 2003
 dt = 0.25; %ms Mainen 1996
-tspan_c = [0:dt:1000];%ms
+tspan_c = [0:dt:10];%ms
 
 
 %default parameters

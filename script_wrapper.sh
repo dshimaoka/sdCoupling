@@ -8,4 +8,4 @@
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=33000
 module load matlab
-matlab -nodisplay -nojvm -nosplash < wrapper.m
+matlab -nodisplay -nodesktop -nosplash < wrapper.m
