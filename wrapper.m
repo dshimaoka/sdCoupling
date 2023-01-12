@@ -1,8 +1,10 @@
 %rmpath('C:\Users\dshi0006\git\dsbox\Stacked_Plot');
 if ispc
-saveServer = ['X:' filesep 'Massive' filesep 'sdCoupling'];
+    saveServer = ['X:' filesep 'Massive' filesep 'sdCoupling'];
+    accpath('C:\Users\dshi0006\git\dsbox\');
 else
     saveServer = '/tmp/$(id -u)/gvfs/smb-share:server=storage.erc.monash.edu.au,share=shares/MNHS-dshi0006/Massive/sdCoupling';
+    addpath('/home/dshi0006/git/dsbox');
 end
 close all
 
