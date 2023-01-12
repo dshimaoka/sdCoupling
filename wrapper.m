@@ -11,7 +11,7 @@ close all
 
 %dt = 0.06; %ms Compte 2003
 dt = 0.25; %ms Mainen 1996
-tspan_c = [0:dt:10];%ms
+tspan_c = [0:dt:1000];%ms
 
 
 %default parameters
@@ -23,10 +23,10 @@ p0 = p;
 %% reconfigure Es > Ed connections in pLR fraction of excitatory neurons
 plrPer = [0];%[0 10 20 40];
 
-gEEPer = [13];%cFac * gEEPer/100 = 1
+gEEPer = [5 10];%cFac * gEEPer/100 = 1
 gIIPer = [20]; %[15 20 25 30];% 20 for SW?
 gEIPer = [100];% [10 15 20 30 40 50]; %10< for E-I balance
-gIEPer = [20 30 50 70 90];%[22];
+gIEPer = [20];% 30 50 70 90];%[22];
 gsdPer = [15];
 
 p0.WEEd = zeros(p.Ne, p.Ne);
