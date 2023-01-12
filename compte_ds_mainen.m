@@ -550,7 +550,8 @@ classdef compte_ds_mainen
     methods(Static)
         function spike = ff(Vpre)
             %works as a spike detector
-            spike = 1./(1 + exp(-(Vpre - 20)/2));
+            Vth = 0; %[mV] changed from +20 on 12/1/23
+            spike = 1./(1 + exp(-(Vpre - Vth)/2));
         end
         
         function out = efun(z)

@@ -2,13 +2,13 @@
 if ispc
 saveServer = ['X:' filesep 'Massive' filesep 'sdCoupling'];
 else
-    saveServer = '/tmp/14223/gvfs/smb-share:server=storage.erc.monash.edu.au,share=shares/MNHS-dshi0006';
+    saveServer = '/tmp/$(id -u)/gvfs/smb-share:server=storage.erc.monash.edu.au,share=shares/MNHS-dshi0006/Massive/sdCoupling';
 end
 close all
 
 %dt = 0.06; %ms Compte 2003
 dt = 0.25; %ms Mainen 1996
-tspan_c = [0:dt:10];%ms
+tspan_c = [0:dt:1000];%ms
 
 
 %default parameters
@@ -22,7 +22,7 @@ plrPer = [0];%[0 10 20 40];
 gEEPer = [13];%cFac * gEEPer/100 = 1
 gIIPer = [20]; %[15 20 25 30];% 20 for SW?
 gEIPer = [100];% [10 15 20 30 40 50]; %10< for E-I balance
-gIEPer = [22];%[20 30 50 70 90];%[22];
+gIEPer = [20 30 50 70 90];%[22];
 gsdPer = [15];
 
 p0.WEEd = zeros(p.Ne, p.Ne);
@@ -182,7 +182,7 @@ for nn = 1:numel(plrPer)
                         if ~doSingle
                             mVs = mean(tcourse(:,1:p.Ne)');
                             mVd = mean(tcourse(:,1+p.Ne:2*p.Ne)');
-                            mVi = mean(tcourse(:,1+Netot:1+p.Ni+Netot)');
+                            mVi = mean(tcourse(:,1+p.Netot:1+p.Ni+p.Netot)');
                         else
                             mVs = tcourse(:,1)';
                             mVd = tcourse(:,2)';
@@ -199,20 +199,21 @@ for nn = 1:numel(plrPer)
                         
                         if ~doSingle
                             %% raster plot of all neurons
-                            figure('position',[0 0 1900 1000]); 
+                            figure('position',[0 0 1900 1000]);
                             %plot(spikeTime(cellID<=p.Ne),cellID(cellID<=p.Ne),'r.');
                             for ii = 1:p.Ne
-                                plot(spikeTimes{1}{ii},ii,'r.');
-                            hold on
+                                plot(spikeTimes{1}{ii},ii*ones(numel(spikeTimes{1}{ii}),1),'r.');
+                                hold on
                             end
-                            for ii = 1:p.N
-                                plot(spikeTimes{1}{ii},p.Ne+ii,'r.');
-                            hold on
+                            for ii = 1:p.Ni
+                                plot(spikeTimes{2}{ii},(p.Ne+ii)*ones(numel(spikeTimes{2}{ii}),1),'b.');
+                                hold on
                             end
-                            legend('soma','dendrite');
-                            xlabel('time [ms');
-                            ylabel('exc cell ID');
-                            saveas(gcf,[saveDir 'spikes' suffix '.png']);close;
+                            xlim([taxis(1) taxis(end)]);
+                            ylim([0 p.Ne+p.Ni]);
+                            xlabel('time [ms]');
+                            ylabel('cell ID (r:exc, b:inh)');
+                            saveas(gcf,[saveDir filesep 'spikes' suffix '.png']);close;
                             
                             
                             %% variables for an excitatory neuron
@@ -224,7 +225,7 @@ for nn = 1:numel(plrPer)
                             thisTable = array2timetable(tcourse(:,idx_e),'TimeStep',...
                                 seconds(1e-3*dt),'variableNames',varNames_e);
                             stackedplot(thisTable);
-                            saveas(gcf, [saveDir 'exc' suffix '.png']);close;
+                            saveas(gcf, [saveDir filesep 'exc' suffix '.png']);close;
                             
                             
                             %% variables for an inhibitory neuron
@@ -246,15 +247,19 @@ for nn = 1:numel(plrPer)
                             condSyn_inh_s=mean(o.condSyn_inh_s);
                             condSyn_inh_i=mean(o.condSyn_inh_i);
                             
+                            figure('position',[0 0 1900 1000]);
                             subplot(311);
-                            plot(taxis, condSyn_exc_s,taxis, condSyn_inh_s);
+                            yyaxis left; plot(taxis, condSyn_exc_s);
+                            yyaxis right; plot(taxis, condSyn_inh_s);
                             title('excitatory soma');
                             legend('exc synpatictic conductance','inh synpatictic conductance');
                             subplot(312);
-                            plot(taxis, condSyn_exc_d,taxis, condSyn_inh_d);
+                            yyaxis left; plot(taxis, condSyn_exc_d);
+                            yyaxis right; plot(taxis, condSyn_inh_d);
                             title('excitatory dendrite');
                             subplot(313);
-                            plot(taxis, condSyn_exc_i,taxis, condSyn_inh_i);
+                            yyaxis left; plot(taxis, condSyn_exc_i);
+                            yyaxis right; plot(taxis, condSyn_inh_i);
                             title('inhibitory neuron');
                             saveas(gcf,[saveDir filesep 'synpaticConductance' suffix '.png']);close;
                         end

@@ -8,7 +8,7 @@ close all
 
 %dt = 0.06; %ms Compte 2003
 dt = 0.25; %ms Mainen 1996
-tspan_c = [0:dt:10];%ms
+tspan_c = [0:dt:1000];%ms
 
 
 %default parameters
@@ -182,7 +182,7 @@ for nn = 1:numel(plrPer)
                         if ~doSingle
                             mVs = mean(tcourse(:,1:p.Ne)');
                             mVd = mean(tcourse(:,1+p.Ne:2*p.Ne)');
-                            mVi = mean(tcourse(:,1+Netot:1+p.Ni+Netot)');
+                            mVi = mean(tcourse(:,1+p.Netot:1+p.Ni+p.Netot)');
                         else
                             mVs = tcourse(:,1)';
                             mVd = tcourse(:,2)';
@@ -231,7 +231,7 @@ for nn = 1:numel(plrPer)
                             %% variables for an inhibitory neuron
                             figure('position',[0 0 1900 1000]);
                             
-                            idx_i = Netot+icell:p.Ni:Netot+6*p.Ni; %inhibitory
+                            idx_i = p.Netot+icell:p.Ni:p.Netot+6*p.Ni; %inhibitory
                             varNames_i = ["Vi","siAMPA","siNMDA","siGABA","hi","ni"];
                             thisTable = array2timetable(tcourse(:,idx_i),'TimeStep',...
                                 seconds(1e-3*dt),'variableNames',varNames_i);
