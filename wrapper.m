@@ -26,7 +26,7 @@ plrPer = [0];%[0 10 20 40];
 gEEPer = [10 13 15];%15%cFac * gEEPer/100 = 1
 gIIPer = [20]; %[15 20 25 30];% 20 for SW?
 gEIPer = 20;%[100];% 15 20 30 40 50]; %10< for E-I balance
-gIEPer = [20];% 30 50 70 90];%[22];
+gIEPer = [30];% 30 50 70 90];%[22];
 gsdPer = [15];
 
 p0.WEEd = zeros(p.Ne, p.Ne);
