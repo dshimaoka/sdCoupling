@@ -129,6 +129,8 @@ p.Cied = cFac*20; %# inhibitory to excitatory dendrite connection. (added)
 p.Cei = cFac*5; %# excitatory to inhibitory connection. 
 p.Cii = cFac*5; %# inhibitory to inhibitory connection. 
 
+% synaptic connectivity [target x source]
+% #connection each neuron receive: sum(Wxx,2)
 if doSingle
     p.WIEs = 0;
     p.WIEd = 0; %(added)

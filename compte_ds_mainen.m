@@ -68,14 +68,6 @@ classdef compte_ds_mainen
             o.ni = Var(o.p.Netot+5*o.p.Ni+1:o.p.Netot+6*o.p.Ni,:); %sodium channel for inhibitory neuron
         end
         
-        %         function nn = Netot(o)
-        %             nn = 20*o.p.Ne;
-        %         end
-        %
-        %         function nn = Nitot(o)
-        %             nn = 6*o.p.Ni;
-        %         end
-        
         
         function [currentDensity, conductance] = INa(o)
             %sodium current (soma)

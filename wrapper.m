@@ -23,14 +23,18 @@ p0 = p;
 %% reconfigure Es > Ed connections in pLR fraction of excitatory neurons
 plrPer = [0];%[0 10 20 40];
 
-gEEPer = [5 10];%cFac * gEEPer/100 = 1
+gEEPer = [10 13 15];%15%cFac * gEEPer/100 = 1
 gIIPer = [20]; %[15 20 25 30];% 20 for SW?
-gEIPer = [100];% [10 15 20 30 40 50]; %10< for E-I balance
+gEIPer = 20;%[100];% 15 20 30 40 50]; %10< for E-I balance
 gIEPer = [20];% 30 50 70 90];%[22];
 gsdPer = [15];
 
 p0.WEEd = zeros(p.Ne, p.Ne);
 
+%% cell ID to visualize
+thisCell = 1;
+
+                        
 mCV = [];
 mnrSpikes = [];
 for nn = 1:numel(plrPer)
@@ -136,7 +140,6 @@ for nn = 1:numel(plrPer)
                         
                         
                         
-                        icell = 1;
                         
                         
                         if saveFig
@@ -151,8 +154,8 @@ for nn = 1:numel(plrPer)
                             varNames_c = ["Ca","condInt_Nad (55)",...
                                 "condInt_Km (-90)","condInt_Ca (140)","condInt_KCa (-90)"];
                             thisTable = array2timetable([...
-                                Ca(icell,:);condInt_Nad(icell,:);condInt_Km(icell,:);condInt_Ca(icell,:);...
-                                condInt_KCa(icell,:)]',...
+                                Ca(thisCell,:);condInt_Nad(thisCell,:);condInt_Km(thisCell,:);condInt_Ca(thisCell,:);...
+                                condInt_KCa(thisCell,:)]',...
                                 'TimeStep',seconds(1e-3*dt),'variableNames',varNames_c);
                             stackedplot(thisTable);
                             saveas(gcf,[saveDir filesep 'conductance_dendrite' suffix '.png']);close;
@@ -169,9 +172,9 @@ for nn = 1:numel(plrPer)
                             
                             varNames_c = ["Na","condInt_Na",...
                                 "condInt_K","condInt_A","condInt_Ks","condInt_KNa"];
-                            thisTable = array2timetable([Na(icell,:);...
-                                condInt_Na(icell,:);condInt_K(icell,:);condInt_A(icell,:);...
-                                condInt_KS(icell,:);condInt_KNa(icell,:)]',...
+                            thisTable = array2timetable([Na(thisCell,:);...
+                                condInt_Na(thisCell,:);condInt_K(thisCell,:);condInt_A(thisCell,:);...
+                                condInt_KS(thisCell,:);condInt_KNa(thisCell,:)]',...
                                 'TimeStep',seconds(1e-3*dt),'variableNames',varNames_c);
                             set(gcf,'position',[0 0 1900 1000]);
                             stackedplot(thisTable);
@@ -208,12 +211,12 @@ for nn = 1:numel(plrPer)
                                 %% raster plot of all neurons
                                 figure('position',[0 0 1900 1000]);
                                 %plot(spikeTime(cellID<=p.Ne),cellID(cellID<=p.Ne),'r.');
-                                for ii = 1:p.Ne
-                                    plot(spikeTimes{1}{ii},ii*ones(numel(spikeTimes{1}{ii}),1),'r.');
+                                for icell = 1:p.Ne
+                                    plot(spikeTimes{1}{icell},icell*ones(numel(spikeTimes{1}{icell}),1),'r.');
                                     hold on
                                 end
-                                for ii = 1:p.Ni
-                                    plot(spikeTimes{2}{ii},(p.Ne+ii)*ones(numel(spikeTimes{2}{ii}),1),'b.');
+                                for icell = 1:p.Ni
+                                    plot(spikeTimes{2}{icell},(p.Ne+icell)*ones(numel(spikeTimes{2}{icell}),1),'b.');
                                     hold on
                                 end
                                 xlim([taxis(1) taxis(end)]);
@@ -226,7 +229,7 @@ for nn = 1:numel(plrPer)
                                 %% variables for an excitatory neuron
                                 %rmpath('C:\Users\dshi0006\git\dsbox\Stacked_Plot');
                                 figure('position',[0 0 1900 1000]);
-                                idx_e = icell:p.Ne:icell+14*p.Ne; %excitatory
+                                idx_e = thisCell:p.Ne:thisCell+14*p.Ne; %excitatory
                                 varNames_e = ["Vs","Vd","Ca","Na","ssGABA","sdGABA","sdAMPA","sdNMDA",...
                                     "ssAMPA","ssNMDA","h","hd","n","ha","mks"];
                                 thisTable = array2timetable(tcourse(:,idx_e),'TimeStep',...
@@ -238,7 +241,7 @@ for nn = 1:numel(plrPer)
                                 %% variables for an inhibitory neuron
                                 figure('position',[0 0 1900 1000]);
                                 
-                                idx_i = p.Netot+icell:p.Ni:p.Netot+6*p.Ni; %inhibitory
+                                idx_i = p.Netot+thisCell:p.Ni:p.Netot+6*p.Ni; %inhibitory
                                 varNames_i = ["Vi","siAMPA","siNMDA","siGABA","hi","ni"];
                                 thisTable = array2timetable(tcourse(:,idx_i),'TimeStep',...
                                     seconds(1e-3*dt),'variableNames',varNames_i);
