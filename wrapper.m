@@ -65,7 +65,11 @@ for nn = 1:numel(plrPer)
                             '_gEEper' num2str(gEEPer(ll)) '_gIEper' num2str(gIEPer(mm))];
                         
                         saveDir = [saveServer filesep suffix(2:end)];
-                        mkdir(saveDir);
+                        [status, msg, msgID] = mkdir(saveDir);
+                       
+                        disp(status);
+                        disp(msg);
+                        disp(msgID);
                         
                         disp(suffix);
                         
