@@ -27,7 +27,7 @@ gsdPer = [0];%15
 gEEPer = [13];%15%cFac * gEEPer/100 = 1
 gIIPer = [20]; %[15 20 25 30];% 20 for SW?
 gEIPer = [20];%[100];% 15 20 30 40 50]; %10< for E-I balance
-gIEPer = [20 30 50 70 90];%[22];
+gIEPer = [20];% 30 50 70 90];%[22];
 
 sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) numel(gIEPer)];
 %total jobs: prod(sz)
@@ -36,18 +36,36 @@ sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) nume
 
 %dt = 0.06; %ms Compte 2003
 dt = 0.25; %ms Mainen 1996
-tspan = [0:dt:8000];%ms
+tspan = [0:dt:3000];%ms
 
 
-%default parameters
+%% default parameters
 saveFig = 1;
 doSingle = 0;
 run('param.m');
 p0 = p;
 
-%% reconfigure Es > Ed connections in pLR fraction of excitatory neurons
 
+%% reconfigure Es > Ed connections in pLR fraction of excitatory neurons
 p0.WEEd = zeros(p.Ne, p.Ne);
+
+
+%% external input
+tgtEcells = p.Ne/2-10+1:p.Ne/2+10;
+extCurrent = 1; %nA
+stimDur = 10; %ms
+misi = 1000; %ms
+jisi = 300; %ms actual isi ranges [misi-jisi misi+jisi]
+
+%isis = 2*jisi*rand(round(tspan(end)/misi),1)+misi-jisi;
+isis = 800; %TEST
+I.tstart = cumsum(isis);
+I.tend = I.tstart + stimDur;
+I.VsExtCurrent = zeros(p.Ne,1);
+I.VsExtCurrent(tgtEcells) = extCurrent;
+I.VdExtCurrent = 0;
+I.ViExtCurrent = 0;
+
 
 %% cell ID to visualize
 thisCell = 1;
@@ -76,7 +94,8 @@ p.gsd = gsdPer(gsdPers)/100*p0.gsd;
 
 suffix = ['_gsd' num2str(gsdPer(gsdPers)) '_rho500' '_pLR' num2str(plrPer(plrPers)) ...
     '_gIIper' num2str(gIIPer(gIIPers)) '_gEIper' num2str(gEIPer(gEIPers)) ...
-    '_gEEper' num2str(gEEPer(gEEPers)) '_gIEper' num2str(gIEPer(gIEPers))];
+    '_gEEper' num2str(gEEPer(gEEPers)) '_gIEper' num2str(gIEPer(gIEPers)),...
+    '_I' num2str(1e3*extCurrent) 'pA'];
 
 saveDir = [saveServer filesep suffix(2:end)];
 [status, msg, msgID] = mkdir(saveDir);
@@ -122,9 +141,10 @@ initialValue_c(p.Netot+1:p.Netot+p.Ni,1) = -80* rand(p.Ni,1); %Vi
 initialValue_c(3*p.Ne+1:4*p.Ne,1) = p.Naeq; %Na+
 initialValue_c(2*p.Ne+1:3*p.Ne,:) = 1e-3; %Ca2+ concentration
 
-[taxis, tcourse, spikeTimes] = ...
-    simulatorWClass(p,tspan,initialValue_c);
-%[taxis,tcourse,spikeTime, cellID] = simulatorWClassWInput(p,tspan_c,initialValue_c, I);
+% [taxis, tcourse, spikeTimes] = ...
+%     simulatorWClassWInput(p,tspan,initialValue_c);
+[taxis,tcourse,spikeTimes] = simulatorWClassWInput(p,tspan,initialValue_c, I);
+
 
 %% spike statistics
 for icell = 1:p.Ne
@@ -145,9 +165,8 @@ mfrRate = mean(nrSpikes)/((taxis(end)-taxis(1))*1e-3); %[Hz]
 %% obtain all variables
 o = compte_ds_mainen(p, tcourse');
 
-
-
-
+thisCell_e = p.Ne/2;
+thisCell_i = p.Ni/2;
 
 if saveFig
     %% Intrinsic conductance for dendrite
@@ -161,8 +180,8 @@ if saveFig
     varNames_c = ["Ca","condInt_Nad (55)",...
         "condInt_Km (-90)","condInt_Ca (140)","condInt_KCa (-90)"];
     thisTable = array2timetable([...
-        Ca(thisCell,:);condInt_Nad(thisCell,:);condInt_Km(thisCell,:);condInt_Ca(thisCell,:);...
-        condInt_KCa(thisCell,:)]',...
+        Ca(thisCell_e,:);condInt_Nad(thisCell_e,:);condInt_Km(thisCell_e,:);condInt_Ca(thisCell_e,:);...
+        condInt_KCa(thisCell_e,:)]',...
         'TimeStep',seconds(1e-3*dt),'variableNames',varNames_c);
     stackedplot(thisTable);
     saveas(gcf,[saveDir filesep 'conductance_dendrite' suffix '.png']);close;
@@ -179,12 +198,18 @@ if saveFig
     
     varNames_c = ["Na","condInt_Na",...
         "condInt_K","condInt_A","condInt_Ks","condInt_KNa"];
-    thisTable = array2timetable([Na(thisCell,:);...
-        condInt_Na(thisCell,:);condInt_K(thisCell,:);condInt_A(thisCell,:);...
-        condInt_KS(thisCell,:);condInt_KNa(thisCell,:)]',...
-        'TimeStep',seconds(1e-3*dt),'variableNames',varNames_c);
-    set(gcf,'position',[0 0 1900 1000]);
-    stackedplot(thisTable);
+    thisData = [Na(thisCell_e,:);...
+        condInt_Na(thisCell_e,:);condInt_K(thisCell_e,:);condInt_A(thisCell_e,:);...
+        condInt_KS(thisCell_e,:);condInt_KNa(thisCell_e,:)]';
+    for ivar = 1:size(thisData,2)
+        ax=subplot(size(thisData,2),1,ivar);
+        plot(taxis, thisData(:,ivar));
+        ylabel(varNames_c(ivar));
+        vbox(I.tstart, I.tend);
+        if ivar<numel(varNames_e)
+                ax.XAxis.Visible = 'off';
+        end
+    end
     saveas(gcf, [saveDir filesep 'conductance_soma' suffix '.png']);close;
     
     % %% figure for intrinsic current for dendrite
@@ -209,9 +234,18 @@ if saveFig
     figure('position',[0 0 1900 1000]);
     %[pspec_s, axisPspec] = pmtm(mVs-mean(mVs),3,numel(taxis),1e3/dt);
     varNames_e = ["mVs","mVd","mVi"];
-    thisTable = array2timetable([mVs' mVd' mVi'], ...
-        'TimeStep',seconds(1e-3*dt),'variableNames',varNames_e);
-    stackedplot(thisTable);
+    %thisTable = array2timetable([mVs' mVd' mVi'], ...
+    %    'TimeStep',seconds(1e-3*dt),'variableNames',varNames_e);
+    %stackedplot(thisTable);
+    subplot(311);
+    plot(taxis, mVs);ylabel('mVs');
+    vbox(I.tstart, I.tend);
+    subplot(312);
+    plot(taxis, mVd);ylabel('mVd');
+    vbox(I.tstart, I.tend);
+    subplot(313);
+    plot(taxis, mVi);ylabel('mVi');
+    vbox(I.tstart, I.tend);
     saveas(gcf, [saveDir filesep 'mV' suffix '.png']);close;
     
     %% powerspectrum
@@ -232,6 +266,7 @@ if saveFig
         end
         xlim([taxis(1) taxis(end)]);
         ylim([0 p.Ne+p.Ni]);
+        vbox(I.tstart, I.tend);
         xlabel('time [ms]');
         ylabel('cell ID (r:exc, b:inh)');
         saveas(gcf,[saveDir filesep 'spikes' suffix '.png']);close;
@@ -240,27 +275,45 @@ if saveFig
         %% variables for an excitatory neuron
         %rmpath('C:\Users\dshi0006\git\dsbox\Stacked_Plot');
         figure('position',[0 0 1900 1000]);
-        idx_e = thisCell:p.Ne:thisCell+14*p.Ne; %excitatory
+        idx_e = thisCell_e:p.Ne:thisCell_e+14*p.Ne; %excitatory
         varNames_e = ["Vs","Vd","Ca","Na","ssGABA","sdGABA","sdAMPA","sdNMDA",...
             "ssAMPA","ssNMDA","h","hd","n","ha","mks"];
-        thisTable = array2timetable(tcourse(:,idx_e),'TimeStep',...
-            seconds(1e-3*dt),'variableNames',varNames_e);
-        stackedplot(thisTable);
+        %thisTable = array2timetable(tcourse(:,idx_e),'TimeStep',...
+        %    seconds(1e-3*dt),'variableNames',varNames_e);
+        %stackedplot(thisTable);
+        for ivar = 1:numel(varNames_e)
+            ax=subplot(numel(varNames_e),1,ivar);
+            plot(taxis, tcourse(:,idx_e(ivar)));
+            if ivar<numel(varNames_e)
+                ax.XAxis.Visible = 'off';
+            end
+            ylabel(varNames_e(ivar));
+            vbox(I.tstart, I.tend);
+        end
         saveas(gcf, [saveDir filesep 'exc' suffix '.png']);close;
         
         
         %% variables for an inhibitory neuron
         figure('position',[0 0 1900 1000]);
         
-        idx_i = p.Netot+thisCell:p.Ni:p.Netot+6*p.Ni; %inhibitory
+        idx_i = p.Netot+thisCell_i:p.Ni:p.Netot+6*p.Ni; %inhibitory
         varNames_i = ["Vi","siAMPA","siNMDA","siGABA","hi","ni"];
-        thisTable = array2timetable(tcourse(:,idx_i),'TimeStep',...
-            seconds(1e-3*dt),'variableNames',varNames_i);
-        s=stackedplot(thisTable);
+        %thisTable = array2timetable(tcourse(:,idx_i),'TimeStep',...
+        %    seconds(1e-3*dt),'variableNames',varNames_i);
+        %s=stackedplot(thisTable);
+        for ivar = 1:numel(varNames_i)
+            ax=subplot(numel(varNames_i),1,ivar);
+            plot(taxis, tcourse(:,idx_i(ivar)));
+            if ivar<numel(varNames_i)
+                ax.XAxis.Visible = 'off';
+            end
+            ylabel(varNames_e(ivar));
+            vbox(I.tstart, I.tend);
+        end
         saveas(gcf,[saveDir filesep 'inh' suffix '.png']);close;
         
         
-        %% synaptic conductance
+        %% mean synaptic conductance
         condSyn_exc_d=mean(o.condSyn_exc_d);
         condSyn_exc_s=mean(o.condSyn_exc_s);
         condSyn_exc_i=mean(o.condSyn_exc_i);
@@ -272,22 +325,25 @@ if saveFig
         subplot(311);
         yyaxis left; plot(taxis, condSyn_exc_s);
         yyaxis right; plot(taxis, condSyn_inh_s);
+        vbox(I.tstart, I.tend);
         title('excitatory soma');
         legend('exc synpatictic conductance','inh synpatictic conductance');
         subplot(312);
         yyaxis left; plot(taxis, condSyn_exc_d);
         yyaxis right; plot(taxis, condSyn_inh_d);
+        vbox(I.tstart, I.tend);
         title('excitatory dendrite');
         subplot(313);
         yyaxis left; plot(taxis, condSyn_exc_i);
         yyaxis right; plot(taxis, condSyn_inh_i);
+        vbox(I.tstart, I.tend);
         title('inhibitory neuron');
         saveas(gcf,[saveDir filesep 'synpaticConductance' suffix '.png']);close;
     end
 end
 
 save([saveDir filesep 'stats' suffix],'p','mCV','mfrRate','spikeTimes','tspan',...
-    'axisPspec','pspec','mVs','mVd','mVi');
+    'axisPspec','pspec','mVs','mVd','mVi', 'I');
 
 
 
