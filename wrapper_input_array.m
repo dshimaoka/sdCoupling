@@ -278,22 +278,22 @@ if saveFig
         saveas(gcf,[saveDir filesep 'spikes' suffix '.png']);close;
         
         
-        %% stimulus triggered avg
-        dt_r = 5;%ms
-        taxis_rs = tspan(1):dt_r:tspan(end);
-        spikeTrace = [];
-        for icell = 1:p.Ne
-            spikeTrace{1}(icell,:) = event2Trace(taxis_rs, spikeTimes{1}{icell});
-        end
-        [avgSpikeTrace, win_rs] = eventLockedAvg(single(spikeTrace{1}), taxis_rs, I.tstart, ...
-            ones(numel(I.tstart),1),[-200 misi-jisi]);
-         figure('position',[0 0 1900 1000]);
-        subplot(3,1,[1 2]);imagesc(win_rs, 1:p.Ne, squeeze(avgSpikeTrace));
-        colormap(1-gray);
-        vline(0);
-        subplot(3,1,3);plot(win_rs, squeeze(avgSpikeTrace)');vline(0);
-        xlabel('time from stim onset [ms]');
-         saveas(gcf,[saveDir filesep 'sta' suffix '.png']);close;
+        %         %% stimulus triggered avg
+        %         dt_r = 5;%ms
+        %         taxis_rs = tspan(1):dt_r:tspan(end);
+        %         spikeTrace = [];
+        %         for icell = 1:p.Ne
+        %             spikeTrace{1}(icell,:) = event2Trace(taxis_rs, spikeTimes{1}{icell});
+        %         end
+        %         [avgSpikeTrace, win_rs] = eventLockedAvg(single(spikeTrace{1}), taxis_rs, I.tstart, ...
+        %             ones(numel(I.tstart),1),[-200 misi-jisi]);
+        %          figure('position',[0 0 1900 1000]);
+        %         subplot(3,1,[1 2]);imagesc(win_rs, 1:p.Ne, squeeze(avgSpikeTrace));
+        %         colormap(1-gray);
+        %         vline(0);
+        %         subplot(3,1,3);plot(win_rs, squeeze(avgSpikeTrace)');vline(0);
+        %         xlabel('time from stim onset [ms]');
+        %          saveas(gcf,[saveDir filesep 'sta' suffix '.png']);close;
        
         
         %% variables for an excitatory neuron
