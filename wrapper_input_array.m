@@ -59,7 +59,7 @@ misi = 800; %ms
 jisi = 200; %ms actual isi ranges [misi-jisi misi+jisi]
 
 %isis = 2*jisi*rand(round(tspan(end)/misi),1)+misi-jisi;
-%isis = 500; %TEST
+isis = 500; %TEST
 I.tstart = cumsum(isis);
 I.tend = I.tstart + stimDur;
 I.VsExtCurrent = zeros(p.Ne,1);
