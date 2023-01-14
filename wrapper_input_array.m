@@ -1,11 +1,11 @@
 %rmpath('C:\Users\dshi0006\git\dsbox\Stacked_Plot');
 if ispc
     saveServer = ['X:' filesep 'Massive' filesep 'sdCoupling'];
-    addpath('C:\Users\dshi0006\git\dsbox\');
+    addpath(genpath('C:\Users\dshi0006\git\dsbox\'));
 else
     %saveServer = '/tmp/$(id -u)/gvfs/smb-share:server=storage.erc.monash.edu.au,share=shares/MNHS-dshi0006/Massive/sdCoupling';
     saveServer = '/home/dshi0006/tmpData';
-    addpath('/home/dshi0006/git/dsbox');
+    addpath(genpath('/home/dshi0006/git/dsbox'));
 end
 close all
 
@@ -36,7 +36,7 @@ sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) nume
 
 %dt = 0.06; %ms Compte 2003
 dt = 0.25; %ms Mainen 1996
-tspan = [0:dt:8000];%ms
+tspan = [0:dt:1000];%ms
 
 
 %% default parameters
@@ -58,7 +58,7 @@ stimDur = 10; %ms
 misi = 800; %ms
 jisi = 200; %ms actual isi ranges [misi-jisi misi+jisi]
 
-isis = 2*jisi*rand(round(tspan(end)/misi),1)+misi-jisi;
+%isis = 2*jisi*rand(round(tspan(end)/misi),1)+misi-jisi;
 %isis = 500; %TEST
 I.tstart = cumsum(isis);
 I.tend = I.tstart + stimDur;
@@ -277,6 +277,24 @@ if saveFig
         ylabel('cell ID (r:exc, b:inh)');
         saveas(gcf,[saveDir filesep 'spikes' suffix '.png']);close;
         
+        
+        %% stimulus triggered avg
+        dt_r = 5;%ms
+        taxis_rs = tspan(1):dt_r:tspan(end);
+        spikeTrace = [];
+        for icell = 1:p.Ne
+            spikeTrace{1}(icell,:) = event2Trace(taxis_rs, spikeTimes{1}{icell});
+        end
+        [avgSpikeTrace, win_rs] = eventLockedAvg(single(spikeTrace{1}), taxis_rs, I.tstart, ...
+            ones(numel(I.tstart),1),[-200 misi-jisi]);
+         figure('position',[0 0 1900 1000]);
+        subplot(3,1,[1 2]);imagesc(win_rs, 1:p.Ne, squeeze(avgSpikeTrace));
+        colormap(1-gray);
+        vline(0);
+        subplot(3,1,3);plot(win_rs, squeeze(avgSpikeTrace)');vline(0);
+        xlabel('time from stim onset [ms]');
+         saveas(gcf,[saveDir filesep 'sta' suffix '.png']);close;
+       
         
         %% variables for an excitatory neuron
         %rmpath('C:\Users\dshi0006\git\dsbox\Stacked_Plot');
