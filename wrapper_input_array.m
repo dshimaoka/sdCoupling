@@ -20,14 +20,14 @@ end
 
 
 %soma-dendrite coupling
-plrPer = [0 10];%5
-gsdPer = [15];%15
+plrPer = [15];%5
+gsdPer = [0 15];%15
 
 %synaptic conductance
 gEEPer = [13];%15%cFac * gEEPer/100 = 1
 gIIPer = [20]; %[15 20 25 30];% 20 for SW?
 gEIPer = [20];%[100];% 15 20 30 40 50]; %10< for E-I balance
-gIEPer = [20 50];% 30 50 70 90];%[22];
+gIEPer = [30];% 30 50 70 90];%[22];
 
 sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) numel(gIEPer)];
 %total jobs: prod(sz)
@@ -36,7 +36,7 @@ sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) nume
 
 %dt = 0.06; %ms Compte 2003
 dt = 0.25; %ms Mainen 1996
-tspan = [0:dt:1000];%ms
+tspan = [0:dt:8000];%ms
 
 
 %% default parameters
@@ -58,8 +58,7 @@ stimDur = 10; %ms
 misi = 800; %ms
 jisi = 200; %ms actual isi ranges [misi-jisi misi+jisi]
 
-%isis = 2*jisi*rand(round(tspan(end)/misi),1)+misi-jisi;
-isis = 500; %TEST
+isis = 2*jisi*rand(round(tspan(end)/misi),1)+misi-jisi;
 I.tstart = cumsum(isis);
 I.tend = I.tstart + stimDur;
 I.VsExtCurrent = zeros(p.Ne,1);

@@ -20,21 +20,25 @@ end
 
 
 %soma-dendrite coupling
-plrPer = [0];%5
-gsdPer = [0];%15
+plrPer = [20 25 30 35];%5
+gsdPer = [0 15];%15
 
 %synaptic conductance
-gEEPer = [10 13 15];%15%cFac * gEEPer/100 = 1
-gIIPer = [15 20 25]; %[15 20 25 30];% 20 for SW?
-gEIPer = [15 20 25];%[100];% 15 20 30 40 50]; %10< for E-I balance
-gIEPer = [15 20 25];% 30 50 70 90];%[22];
+gEEPer = [13];%15%cFac * gEEPer/100 = 1
+gIIPer = [20]; %[15 20 25 30];% 20 for SW?
+gEIPer = [20];%[100];% 15 20 30 40 50]; %10< for E-I balance
+gIEPer = [30];%[22];
 
-sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) numel(gIEPer)];
+sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) ...
+    numel(gIEPer)];
 %total jobs: prod(sz)
 
 
-
-for pen = 1:81
+mCVp = nan;
+mfrRatep = nan;
+mVsp = nan(32001,1);
+mpspecp = nan(16001,1);
+for pen = 1:40
     
     [plrPers,gsdPers,gEEPers,gIIPers,gEIPers,gIEPers] = ind2sub(sz, pen);
     
@@ -45,7 +49,7 @@ for pen = 1:81
     
     try
 
-        saveDir = [saveServer filesep  '20230112_paramSearch' filesep suffix(2:end) ]; 
+        saveDir = [saveServer filesep  '20230114_paramSearch' filesep suffix(2:end) ]; 
         load([saveDir filesep 'stats' suffix],'p','mCV','mfrRate','spikeTimes','tspan',...
             'axisPspec','pspec','mVs','mVd','mVi');
         mCVp(plrPers,gsdPers,gEEPers,gIIPers,gEIPers,gIEPers) = mCV;
@@ -54,22 +58,23 @@ for pen = 1:81
         mpspecp(:,plrPers,gsdPers,gEEPers,gIIPers,gEIPers,gIEPers) = pspec;
         
     catch err
+        disp(err)
         disp([suffix ' NOT FOUND']);
     end
 end
 
 %% firing rate
-for ii = 1:3
-    for jj = 1:3
-        subplot(3,3,ii+3*(jj-1));
-        imagesc(squeeze(mfrRatep(1,1,:,ii,jj,:)));
-        title(['giiPers' num2str(gIIPer(ii)) ', geiPers' num2str(gEIPer(jj))]);
-        set(gca,'ytick',1:numel(gEEPer),'ytickLabel',gEEPer);ylabel('gEEper');
-        set(gca,'xtick',1:numel(gIEPer),'xtickLabel',gIEPer);xlabel('gIEper');
+for ii = 1:numel(plrPer)
+    for jj = 1:numel(gsdPer)
+        aa(ii,jj) = subplot(numel(gsdPer),numel(plrPer),ii+numel(plrPer)*(jj-1));
+        %imagesc(squeeze(mfrRatep(1,1,:,ii,jj,:)));
+        plot(gIEPer, squeeze(mfrRatep(ii,jj,:,:,:,:)),'-o');
+        title(['plrPers' num2str(plrPer(ii)) ', gsdPers' num2str(gsdPer(jj))]);
+        xlabel('gsdper');
         caxis(prctile(mfrRatep(:),[1 99]));
     end
 end
-mcolorbar;
+linkaxes(aa(:));
 saveas(gcf,'mfrRate.png');
 
 %% CV
