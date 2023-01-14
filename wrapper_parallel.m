@@ -22,8 +22,8 @@ end
 
 %% load parameter
 %suffix = '_gsd0_rho500_pLR15_gIIper20_gEIper20_gEEper13_gIEper30';
-suffix = '_gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper13_gIEper50';
-%suffix = '_gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper10_gIEper30';
+%suffix = '_gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper13_gIEper50';
+suffix = '_gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper10_gIEper30';
 
 pname = ['stats' suffix '.mat'];
 load(pname, 'p');
