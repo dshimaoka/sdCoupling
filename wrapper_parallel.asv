@@ -23,14 +23,14 @@ end
 %% load parameter
 suffix = '_gsd0_rho500_pLR15_gIIper20_gEIper20_gEEper13_gIEper30';
 %suffix = '_gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper13_gIEper50';
-suffix = '_gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper10_gIEper30';
+%suffix = '_gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper10_gIEper30';
 
 pname = ['stats' suffix '.mat'];
 load(pname, 'p');
 
 %% set initial values
 dt = 0.25; %ms Mainen 1996
-tspan = [0:dt:8000];%ms
+tspan = [0:dt:80];%ms
 
 initialValue_c = zeros(p.Netot+p.Nitot,1);
 initialValue_c(1:2*p.Ne,1) = -80*rand(2*p.Ne,1); %Vs, Vd
@@ -63,5 +63,5 @@ saveDir = [saveServer filesep suffix(2:end)];
 
 
 %% save the result
-save([saveDir filesep 'stats' suffix '_' pen],'p','spikeTimes',...
+save([saveDir filesep 'stats' suffix '_I' num2str(1e3*extCurrent) 'nA_' numpen)],'p','spikeTimes',...
     'taxis','tspan');
