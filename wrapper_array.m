@@ -59,6 +59,8 @@ p = getLRconnectivity(p0, plrPer(plrPers)/100);
 % newWeights = lognrnd(mu, sigma, numel(theseConnections),1);
 % p.WEEs(theseConnections) = newWeights;
 
+%spike transmission delay
+p.lags = 2;%[ms]
 
 %% cell ID to visualize
 thisCell = 1;
@@ -85,7 +87,8 @@ p.gsd = gsdPer(gsdPers)/100*p0.gsd;
 
 suffix = ['_gsd' num2str(gsdPer(gsdPers)) '_rho500' '_pLR' num2str(plrPer(plrPers)) ...
     '_gIIper' num2str(gIIPer(gIIPers)) '_gEIper' num2str(gEIPer(gEIPers)) ...
-    '_gEEper' num2str(gEEPer(gEEPers)) '_gIEper' num2str(gIEPer(gIEPers))];
+    '_gEEper' num2str(gEEPer(gEEPers)) '_gIEper' num2str(gIEPer(gIEPers)) ...
+    '_lags' num2str(p.lags)];
 
 saveDir = [saveServer filesep suffix(2:end)];
 [status, msg, msgID] = mkdir(saveDir);
@@ -123,7 +126,6 @@ p.VL = -60.95+VLSD*randn(p.Ne,1); %necessary for spontaneous firing
 % p.gKm = 10*p0.gKm;
 % p.gKv = 10*p0.gKv;
 
-p.lags = 2;%[ms]
 init = @(t)getInitialValues(t,p);
 
 [taxis, tcourse, spikeTimes] = ...
