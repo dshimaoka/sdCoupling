@@ -7,6 +7,6 @@
 #SBATCH --time=40:00:00
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=33000
-#SBATCH --array=1-20
+#SBATCH --array=1-2
 module load matlab
 matlab -nodisplay -nodesktop -nosplash < wrapper_array.m
