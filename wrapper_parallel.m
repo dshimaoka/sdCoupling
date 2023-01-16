@@ -19,18 +19,29 @@ else
     pen = 1;
 end
 
+nItr = 20; %total iteration per condition
+dt = 0.25; %ms Mainen 1996
+tspan = [0:dt:100];%ms
 
 %% load parameter
-%suffix = '_gsd0_rho500_pLR15_gIIper20_gEIper20_gEEper13_gIEper30';
-%suffix = '_gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper13_gIEper50';
-suffix = '_gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper10_gIEper30';
+if pen < nItr
+        suffix = '_gsd0_rho500_pLR15_gIIper20_gEIper20_gEEper13_gIEper30'; %synchronous
+elseif pen < 2*nItr
+        suffix = '_gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper13_gIEper50';%asynchrnous 1
+% else
+%         suffix = '_gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper10_gIEper30';%asynchrnous 2
+end
 
 pname = ['stats' suffix '.mat'];
 load(pname, 'p');
 
+
+%% set random number generator
+rng('shuffle');
+%otherwise the seed is identical across the jobs?
+
+
 %% set initial values
-dt = 0.25; %ms Mainen 1996
-tspan = [0:dt:10000];%ms
 
 initialValue_c = zeros(p.Netot+p.Nitot,1);
 initialValue_c(1:2*p.Ne,1) = -80*rand(2*p.Ne,1); %Vs, Vd
@@ -43,7 +54,7 @@ initialValue_c(2*p.Ne+1:3*p.Ne,:) = 1e-3; %Ca2+ concentration
 tgtEcells = p.Ne/2-50+1:p.Ne/2+50;
 extCurrent = 1; %nA
 stimDur = 10; %ms
-misi = 800; %ms
+misi = 1000; %ms
 jisi = 300; %ms actual isi ranges [misi-jisi misi+jisi]
 
 isis = 2*jisi*rand(round(tspan(end)/misi),1)+misi-jisi;
@@ -64,4 +75,20 @@ saveDir = [saveServer filesep suffix(2:end)];
 
 %% save the result
 save([saveDir filesep 'stats' suffix '_I' num2str(1e3*extCurrent) 'pA_' num2str(pen)],...
-    'p','spikeTimes','taxis','tspan');
+    'p','spikeTimes','taxis','tspan','initialValue_c','I');
+
+
+%% analysis
+% saveDir = 'X:\Massive\sdCoupling\20230115\gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper10_gIEper30';
+% dd=dir(saveDir);
+% idx = strfind({dd.name},'.mat');
+% dataNames = {dd(~isempty(idx)).name};
+% for pen = 1:numel(dd)
+%     if ~isempty(idx{pen})
+%         load(fullfile(saveDir,dd(pen).name),...
+%             'p','spikeTimes','taxis','tspan');
+%     end
+%     
+% end
+
+

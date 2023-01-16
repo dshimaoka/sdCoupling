@@ -55,7 +55,7 @@ p = getLRconnectivity(p0, plrPer(plrPers)/100);
 tgtEcells = p.Ne/2-50+1:p.Ne/2+50;
 extCurrent = 1; %nA
 stimDur = 10; %ms
-misi = 800; %ms
+misi = 1000; %ms
 jisi = 200; %ms actual isi ranges [misi-jisi misi+jisi]
 
 %isis = 2*jisi*rand(round(tspan(end)/misi),1)+misi-jisi;
@@ -261,20 +261,7 @@ if saveFig
     if ~doSingle
         %% raster plot of all neurons
         figure('position',[0 0 1900 1000]);
-        %plot(spikeTime(cellID<=p.Ne),cellID(cellID<=p.Ne),'r.');
-        for icell = 1:p.Ne
-            plot(spikeTimes{1}{icell},icell*ones(numel(spikeTimes{1}{icell}),1),'r.');
-            hold on
-        end
-        for icell = 1:p.Ni
-            plot(spikeTimes{2}{icell},(p.Ne+icell)*ones(numel(spikeTimes{2}{icell}),1),'b.');
-            hold on
-        end
-        xlim([taxis(1) taxis(end)]);
-        ylim([0 p.Ne+p.Ni]);
-        vbox(I.tstart, I.tend);
-        xlabel('time [ms]');
-        ylabel('cell ID (r:exc, b:inh)');
+        showRasterEI(spikeTimes, p, taxis, I)
         saveas(gcf,[saveDir filesep 'spikes' suffix '.png']);close;
         
         
