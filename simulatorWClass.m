@@ -1,8 +1,16 @@
 function [taxis, tcourse, spikeTimes] = simulatorWClass(p,tspan,initialValue)
+%[taxis, tcourse, spikeTimes] = simulatorWClass(p,tspan,initialValue)
+%
+% 17/1/23 now compatible with p.delay
 
-% [taxis,tcourse] = ode23(@GAmodel, tspan, initialValue);
-% [taxis,tcourse] = ode45(@GAmodel, tspan, initialValue);
-[taxis,tcourse] = ode23(@Compte_ds_mainenModel, tspan, initialValue);
+if p.lags==0
+    [taxis,tcourse] = ode23(@Compte_ds_mainenModel, tspan, initialValue(1));
+elseif p.lags>0
+    options = ddeset('InitialStep',1);
+    sol = dde23(@Compte_ds_mainen_delayModel, p.lags, initialValue, tspan, options);
+    taxis = tspan';
+    tcourse = deval(sol, taxis)';
+end
 
 if nargin>2
     %     [tidx, cellID] = find(tcourse > p.Vth);
@@ -17,19 +25,20 @@ if nargin>2
      end
 end
   
-    function dVar = CompteModel(t, Var)
-        disp(t);
-         o = compte(p, Var); %construct class
+ function dVar = Compte_ds_mainen_delayModel(t, Var, VarL)
+        if rem(t,1)==0
+            disp(t);
+        end
+        
+         o = compte_ds_mainen_delay(p, Var, VarL); %construct class
         dVar = o.dVar;
-    end
-    function dVar = Compte_dsModel(t, Var)
-        disp(t);
-         o = compte_ds(p, Var); %construct class
-        dVar = o.dVar;
-    end
- function dVar = Compte_ds_mainenModel(t, Var)
-        disp(t);
-         o = compte_ds_mainen(p, Var); %construct class
+ end
+function dVar = Compte_ds_mainenModel(t, Var)
+        if rem(t,1)==0
+            disp(t);
+        end
+        
+        o = compte_ds_mainen(p, Var); %construct class
         dVar = o.dVar;
     end
 end
