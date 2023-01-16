@@ -47,12 +47,16 @@ if nargin>2
 end
 
     function dVar = Compte_ds_mainenModel_woInput(t, Var)
-        disp(t);
+        if rem(t,1)==0
+            disp(t);
+        end
         o = compte_ds_mainen(p0, Var); %construct class
         dVar = o.dVar;
     end
     function dVar = Compte_ds_mainenModel_wInput(t, Var)
-        disp(t);
+        if rem(t,1)==0
+            disp(t);
+        end
         o = compte_ds_mainen(p1, Var); %construct class
         dVar = o.dVar;
     end
