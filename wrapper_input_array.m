@@ -20,14 +20,14 @@ end
 
 
 %soma-dendrite coupling
-plrPer = [15];%5
+plrPer = [0 10];%5
 gsdPer = [15];%15
 
 %synaptic conductance
 gEEPer = [10];%15%cFac * gEEPer/100 = 1
 gIIPer = [20]; %[15 20 25 30];% 20 for SW?
-gEIPer = [20];%[100];% 15 20 30 40 50]; %10< for E-I balance
-gIEPer = [30];% 30 50 70 90];%[22];
+gEIPer = [100];%[100];% 15 20 30 40 50]; %10< for E-I balance
+gIEPer = [22];% 30 50 70 90];%[22];
 
 sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) numel(gIEPer)];
 %total jobs: prod(sz)

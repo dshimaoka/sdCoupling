@@ -20,7 +20,7 @@ end
 
 
 %soma-dendrite coupling
-plrPer = [20 25 30 35];%5
+plrPer = [15];%5
 gsdPer = [0 15];%15
 
 %synaptic conductance
@@ -36,7 +36,7 @@ sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) nume
 
 %dt = 0.06; %ms Compte 2003
 dt = 0.25; %ms Mainen 1996
-tspan = [0:dt:8000];%ms
+tspan = [0:dt:1000];%ms
 
 
 %default parameters
@@ -46,15 +46,24 @@ run('param.m');
 p0 = p;
 
 %% reconfigure Es > Ed connections in pLR fraction of excitatory neurons
-
 p0.WEEd = zeros(p.Ne, p.Ne);
+p = getLRconnectivity(p0, plrPer(plrPers)/100);
+
+
+%% log-normal weight of WEEs
+% %find all connections
+% theseConnections = find(p.WEEs(:,:)>0);
+% %f = @(x)exp(-(x - tgtPosition).^2/2/sigma^2);
+% sigma = 1;
+% mu = log(0.2)+sigma^2;
+% newWeights = lognrnd(mu, sigma, numel(theseConnections),1);
+% p.WEEs(theseConnections) = newWeights;
+
 
 %% cell ID to visualize
 thisCell = 1;
 
 
-%% define WEEd
-p = getLRconnectivity(p0, plrPer(plrPers)/100);
 
 %% assign non-zero gsd to long-range projection neurons
 LRidx = find(sum(p.WEEd,1)>0);
@@ -114,17 +123,13 @@ p.VL = -60.95+VLSD*randn(p.Ne,1); %necessary for spontaneous firing
 % p.gKm = 10*p0.gKm;
 % p.gKv = 10*p0.gKv;
 
-
-
-initialValue_c = zeros(p.Netot+p.Nitot,1);
-initialValue_c(1:2*p.Ne,1) = -80*rand(2*p.Ne,1); %Vs, Vd
-initialValue_c(p.Netot+1:p.Netot+p.Ni,1) = -80* rand(p.Ni,1); %Vi
-initialValue_c(3*p.Ne+1:4*p.Ne,1) = p.Naeq; %Na+
-initialValue_c(2*p.Ne+1:3*p.Ne,:) = 1e-3; %Ca2+ concentration
+p.lags = 2;%[ms]
+init = @(t)getInitialValues(t,p);
 
 [taxis, tcourse, spikeTimes] = ...
-    simulatorWClass(p,tspan,initialValue_c);
+    simulatorWClass_delay(p,tspan, init);
 %[taxis,tcourse,spikeTime, cellID] = simulatorWClassWInput(p,tspan_c,initialValue_c, I);
+
 
 %% spike statistics
 for icell = 1:p.Ne
@@ -143,7 +148,7 @@ mCV = mean(CV);
 mfrRate = mean(nrSpikes)/((taxis(end)-taxis(1))*1e-3); %[Hz]
 
 %% obtain all variables
-o = compte_ds_mainen(p, tcourse');
+o = compte_ds_mainen(p, tcourse'); %compte_ds_mainen is fine
 
 
 
@@ -221,19 +226,8 @@ if saveFig
     if ~doSingle
         %% raster plot of all neurons
         figure('position',[0 0 1900 1000]);
-        %plot(spikeTime(cellID<=p.Ne),cellID(cellID<=p.Ne),'r.');
-        for icell = 1:p.Ne
-            plot(spikeTimes{1}{icell},icell*ones(numel(spikeTimes{1}{icell}),1),'r.');
-            hold on
-        end
-        for icell = 1:p.Ni
-            plot(spikeTimes{2}{icell},(p.Ne+icell)*ones(numel(spikeTimes{2}{icell}),1),'b.');
-            hold on
-        end
-        xlim([taxis(1) taxis(end)]);
-        ylim([0 p.Ne+p.Ni]);
-        xlabel('time [ms]');
-        ylabel('cell ID (r:exc, b:inh)');
+        showRasterEI(spikeTimes,p,taxis);
+      
         saveas(gcf,[saveDir filesep 'spikes' suffix '.png']);close;
         
         
@@ -288,6 +282,7 @@ end
 
 save([saveDir filesep 'stats' suffix],'p','mCV','mfrRate','spikeTimes','tspan',...
     'axisPspec','pspec','mVs','mVd','mVi');
+
 
 
 
