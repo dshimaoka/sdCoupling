@@ -21,7 +21,12 @@ end
 
 nItr = 20; %total iteration per condition
 dt = 0.25; %ms Mainen 1996
-tspan = [0:dt:100];%ms
+tspan = [0:dt:10000];%ms
+ntgtCells = 100;%
+extCurrent = 1.5; %nA
+stimDur = 10; %ms
+misi = 1000; %ms
+jisi = 300; %ms actual isi ranges [misi-jisi misi+jisi]
 
 %% load parameter
 if pen < nItr
@@ -51,12 +56,7 @@ initialValue_c(2*p.Ne+1:3*p.Ne,:) = 1e-3; %Ca2+ concentration
 
 
 %% set external input
-tgtEcells = p.Ne/2-50+1:p.Ne/2+50;
-extCurrent = 1; %nA
-stimDur = 10; %ms
-misi = 1000; %ms
-jisi = 300; %ms actual isi ranges [misi-jisi misi+jisi]
-
+tgtEcells = p.Ne/2-round(ntgtCells/2)+1:p.Ne/2+round(ntgtCells/2);
 isis = 2*jisi*rand(round(tspan(end)/misi),1)+misi-jisi;
 I.tstart = cumsum(isis);
 I.tend = I.tstart + stimDur;
