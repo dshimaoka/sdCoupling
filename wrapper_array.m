@@ -36,7 +36,7 @@ sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) nume
 
 %dt = 0.06; %ms Compte 2003
 dt = 0.25; %ms Mainen 1996
-tspan = [0:dt:1000];%ms
+tspan = [0:dt:100];%ms
 
 
 %default parameters
