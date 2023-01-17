@@ -21,13 +21,13 @@ end
 
 %soma-dendrite coupling
 plrPer = [15];%5
-gsdPer = [0 15];%15
+gsdPer = [0];%15
 
 %synaptic conductance
-gEEPer = [10 13 15];%15%cFac * gEEPer/100 = 1
+gEEPer = [7 10 13 15];%15%cFac * gEEPer/100 = 1
 gIIPer = [20]; %[15 20 25 30];% 20 for SW?
 gEIPer = [20];%[100];% 15 20 30 40 50]; %10< for E-I balance
-gIEPer = [20 30 50];%[22];
+gIEPer = [20];%[22];
 
 sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) numel(gIEPer)];
 %total jobs: prod(sz)
@@ -36,7 +36,7 @@ sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) nume
 
 %dt = 0.06; %ms Compte 2003
 dt = 0.25; %ms Mainen 1996
-tspan = [0:dt:2000];%ms
+tspan = [0:dt:200];%ms
 
 
 %default parameters
@@ -51,13 +51,15 @@ p = getLRconnectivity(p0, plrPer(plrPers)/100);
 
 
 %% log-normal weight of WEEs
-% %find all connections
-% theseConnections = find(p.WEEs(:,:)>0);
-% %f = @(x)exp(-(x - tgtPosition).^2/2/sigma^2);
-% sigma = 1;
-% mu = log(0.2)+sigma^2;
-% newWeights = lognrnd(mu, sigma, numel(theseConnections),1);
-% p.WEEs(theseConnections) = newWeights;
+if lognWeight
+    %find all connections
+    theseConnections = find(p.WEEs(:,:)>0);
+    %f = @(x)exp(-(x - tgtPosition).^2/2/sigma^2);
+    sigma = 1;
+    mu = log(0.2)+sigma^2;
+    newWeights = lognrnd(mu, sigma, numel(theseConnections),1);
+    p.WEEs(theseConnections) = newWeights;
+end
 
 %spike transmission delay
 p.lags = 2;%[ms]
@@ -89,6 +91,9 @@ suffix = ['_gsd' num2str(gsdPer(gsdPers)) '_rho500' '_pLR' num2str(plrPer(plrPer
     '_gIIper' num2str(gIIPer(gIIPers)) '_gEIper' num2str(gEIPer(gEIPers)) ...
     '_gEEper' num2str(gEEPer(gEEPers)) '_gIEper' num2str(gIEPer(gIEPers)) ...
     '_lags' num2str(p.lags)];
+if lognWeight
+    suffix = [suffix '_lognWeight'];
+end
 
 saveDir = [saveServer filesep suffix(2:end)];
 [status, msg, msgID] = mkdir(saveDir);

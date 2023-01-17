@@ -79,16 +79,49 @@ save([saveDir filesep 'stats' suffix '_I' num2str(1e3*extCurrent) 'pA_' num2str(
 
 
 %% analysis
-% saveDir = 'X:\Massive\sdCoupling\20230115\gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper10_gIEper30';
-% dd=dir(saveDir);
-% idx = strfind({dd.name},'.mat');
-% dataNames = {dd(~isempty(idx)).name};
-% for pen = 1:numel(dd)
-%     if ~isempty(idx{pen})
-%         load(fullfile(saveDir,dd(pen).name),...
-%             'p','spikeTimes','taxis','tspan');
-%     end
-%     
-% end
+saveDir = 'X:\Massive\sdCoupling\20230117\gsd0_rho500_pLR15_gIIper20_gEIper20_gEEper13_gIEper30';
+saveDir = 'X:\Massive\sdCoupling\20230117\gsd15_rho500_pLR15_gIIper20_gEIper20_gEEper13_gIEper50';
+dd=dir(saveDir);
+idx = strfind({dd.name},'.mat');
+
+spikeTrace_all = [];
+taxis_rs_all = [];
+tstart_all = [];
+for pen = 1:numel(dd)
+    if ~isempty(idx{pen})
+        load(fullfile(saveDir,dd(pen).name),...
+            'p','spikeTimes','taxis','tspan','I');
+        %         showRasterEI(spikeTimes,p,taxis,I);
+        
+        %% stimulus triggered avg
+        dt_r = 5;%ms
+        taxis_rs = tspan(1):dt_r:tspan(end);
+        spikeTrace = [];
+        for icell = 1:p.Ne
+            spikeTrace(icell,:) = event2Trace(taxis_rs, spikeTimes{1}{icell});
+        end
+        
+        spikeTrace_all = [spikeTrace_all spikeTrace];
+        if isempty(taxis_rs_all)
+            taxis_rs_all = taxis_rs;
+            tstart_all = I.tstart;
+        else
+            taxis_rs_all = [taxis_rs_all max(taxis_rs_all)+dt_r+taxis_rs];
+            tstart_all = [tstart_all max(taxis_rs_all)+dt_r+I.tstart];
+        end
+    end
+end
+
+[avgSpikeTrace, win_rs] = eventLockedAvg(single(spikeTrace_all), taxis_rs_all,...
+    tstart_all, ones(numel(tstart_all),1),[-200 misi-jisi]);
+figure('position',[0 0 1900 1000]);
+subplot(3,1,[1 2]);imagesc(win_rs, 1:p.Ne, squeeze(avgSpikeTrace));
+colormap(1-gray);
+mcolorbar;
+vline(0);
+subplot(3,1,3);plot(win_rs, squeeze(avgSpikeTrace)');vline(0);
+xlabel('time from stim onset [ms]');
+saveas(gcf,[saveDir filesep 'sta' '.png']);close;
+
 
 
