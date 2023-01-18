@@ -34,9 +34,9 @@ end
         dVar = o.dVar;
  end
 function dVar = Compte_ds_mainenModel(t, Var)
-        %if rem(t,1)==0
+        if rem(t,1)==0
             disp(t);
-        %end
+        end
         
         o = compte_ds_mainen(p, Var); %construct class
         dVar = o.dVar;

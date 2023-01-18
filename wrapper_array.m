@@ -19,17 +19,17 @@ else
 end
 
 %KNa for soma
-gKNaPer = [100 70];
+gKNaPer = [100 60 40 20];
 
 %GABA decay constant
-tauGABAPer = [100 80];
+tauGABAPer = [100 60 40 20];
 
 %synaptic transmission delay
 delay = 0; %[ms]
 
 %soma-dendrite coupling
 plrPer = [15];%5
-gsdPer = [0];%15
+gsdPer = [0 15];%15
 
 %synaptic conductance
 gEEPer = [13];%15%cFac * gEEPer/100 = 1
