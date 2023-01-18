@@ -19,10 +19,10 @@ else
 end
 
 %KNa for soma
-gKNaPer = [100 90 80];
+gKNaPer = [100 70];
 
 %GABA decay constant
-tauGABAPer = [100 90 80];
+tauGABAPer = [100 80];
 
 %synaptic transmission delay
 delay = 0; %[ms]
@@ -35,7 +35,7 @@ gsdPer = [0];%15
 gEEPer = [13];%15%cFac * gEEPer/100 = 1
 gIIPer = [20]; %[15 20 25 30];% 20 for SW?
 gEIPer = [20];%[100];% 15 20 30 40 50]; %10< for E-I balance
-gIEPer = [20];%[22];
+gIEPer = [30];%[22];
 
 sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) ...
     numel(gIEPer) numel(gKNaPer) numel(tauGABAPer)];
@@ -46,7 +46,7 @@ sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) ...
 
 %dt = 0.06; %ms Compte 2003
 dt = 0.25; %ms Mainen 1996
-tspan = [0:dt:1000];%ms
+tspan = [0:dt:2000];%ms
 
 
 %default parameters
