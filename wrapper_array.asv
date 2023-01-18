@@ -19,10 +19,10 @@ else
 end
 
 %KNa for soma
-gKNaPer = [100 90 80];
+gKNaPer = 95;%[100 95 90];
 
-%GABA decay constant
-tauGABAPer = [100 90 80];
+%GABA
+tauGABAPer = 100;
 
 %synaptic transmission delay
 delay = 0; %[ms]
@@ -46,7 +46,7 @@ sz = [numel(plrPer) numel(gsdPer) numel(gEEPer) numel(gIIPer) numel(gEIPer) ...
 
 %dt = 0.06; %ms Compte 2003
 dt = 0.25; %ms Mainen 1996
-tspan = [0:dt:1000];%ms
+tspan = [0:dt:200];%ms
 
 
 %default parameters
@@ -84,7 +84,7 @@ thisCell = 1;
 LRidx = find(sum(p.WEEd,1)>0);
 p.gsd = zeros(p.Ne,1);
 
-p.gKNa = gKNaPer(gKNaPers)/100*p0.gKNa;
+p.gKNa = gKNaPer(gKNaPers)/100*p0.gKNaPer;
 p.tauGABA = tauGABAPer(tauGABAPers)/100*p0.tauGABA;
 
 p.gEEsAMPA = gEEPer(gEEPers)/100*p0.gEEsAMPA;
@@ -103,7 +103,7 @@ p.gsd = gsdPer(gsdPers)/100*p0.gsd;
 suffix = ['_gsd' num2str(gsdPer(gsdPers)) '_rho500' '_pLR' num2str(plrPer(plrPers)) ...
     '_gIIper' num2str(gIIPer(gIIPers)) '_gEIper' num2str(gEIPer(gEIPers)) ...
     '_gEEper' num2str(gEEPer(gEEPers)) '_gIEper' num2str(gIEPer(gIEPers)) ...
-    '_gKNaper' num2str(gKNaPer(gKNaPers)) '_tauGABAper' num2str(tauGABAPer(tauGABAPers)) ...
+    '_gKNaper' num2str(gKNaPer(gKNaPers)) '_tauGABAper' num2str(tauGA...
     '_lags' num2str(p.lags)];
 if lognWeight
     suffix = [suffix '_lognWeight'];
@@ -170,6 +170,9 @@ mfrRate = mean(nrSpikes)/((taxis(end)-taxis(1))*1e-3); %[Hz]
 
 %% obtain all variables
 o = compte_ds_mainen(p, tcourse'); %compte_ds_mainen is fine
+
+
+
 
 
 if saveFig
